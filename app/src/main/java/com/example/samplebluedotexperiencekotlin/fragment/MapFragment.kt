@@ -70,7 +70,7 @@ class MapFragment : Fragment(),IndoorLocationCallback{
     lateinit var currentmap : MistMap
 
     @BindView(R.id.floorplanbluedot)
-    lateinit var floorplanBluedotView : FrameLayout
+    lateinit var floorplanBluedotView
 
     @BindView(R.id.progress_bar)
     lateinit var progressBar: ProgressBar
