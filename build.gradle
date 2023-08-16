@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
-}*/
+}
 
 buildscript {
     ext.kotlin_version = '1.8.20'
@@ -28,7 +28,7 @@ buildscript {
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
-}
+} */
 
 plugins {
     id 'com.android.application' version '8.0.2' apply false

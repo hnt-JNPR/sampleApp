@@ -69,18 +69,17 @@ class MapFragment : Fragment(),IndoorLocationCallback{
 
     lateinit var currentmap : MistMap
 
-    @BindView(R.id.floorplanbluedot)
-    lateinit var floorplanBluedotView
+    //@BindView(R.id.floorplanbluedot)
+    var floorplanBluedotView : FrameLayout = floorplanbluedot
 
-    @BindView(R.id.progress_bar)
-    lateinit var progressBar: ProgressBar
+    //@BindView(R.id.progress_bar)
+    var progressBar: ProgressBar = progress_bar
 
-    @BindView(R.id.floorplan_image)
-    lateinit var floorPlanImage: ImageView
+    //@BindView(R.id.floorplan_image)
+    var floorPlanImage: ImageView = floorplan_image
 
-    @BindView(R.id.txt_error)
-    lateinit var txtError : TextView
-
+    //@BindView(R.id.txt_error)
+    var txtError : TextView = txt_error
 
     fun newInstance(sdkToken: String): MapFragment {
         val bundle = Bundle()
