@@ -41,6 +41,10 @@ android {
         //jvmTarget = '1.8'
         jvmTarget = '17'
     }
+
+    buildFeatures{
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -53,10 +57,10 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    /*implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.2-3"
     //noinspection GradleCompatible
-    implementation 'com.android.support:appcompat-v7:26.0.0'
+    implementation 'com.android.support:appcompat-v7:26.0.0' */
 
     //Mist SDK implementation
     implementation 'com.mist:core-sdk:3.0.3'

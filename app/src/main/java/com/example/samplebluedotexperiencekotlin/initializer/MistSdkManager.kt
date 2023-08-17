@@ -17,15 +17,11 @@ class MistSdkManager {
      */
 
     private var indoorLocationManager: IndoorLocationManager?=null
-    private lateinit var indoorLocationCallback : IndoorLocationCallback
-    private lateinit var virtualBeaconCallback: VirtualBeaconCallback
-    private lateinit var contextWeakReference: WeakReference<Context>
+    private var indoorLocationCallback : IndoorLocationCallback?=null
+    private var virtualBeaconCallback: VirtualBeaconCallback?=null
+    private var contextWeakReference: WeakReference<Context>?=null
     private var sdkInitializer : MistSdkManager? = null
     private var orgSecret : String? = null
-
-    private fun MistSdkManager():MistSdkManager{
-        return MistSdkManager()
-    }
 
     fun getInstance(context: Context): MistSdkManager? {
         contextWeakReference = WeakReference(context)
@@ -52,7 +48,7 @@ class MistSdkManager {
     fun startMistSdk(){
         if(indoorLocationManager==null){
             Log.d("","IndoorLocationManager Start"+orgSecret)
-            indoorLocationManager = IndoorLocationManager.getInstance(contextWeakReference.get(),orgSecret)
+            indoorLocationManager = IndoorLocationManager.getInstance(contextWeakReference?.get(),orgSecret)
             indoorLocationManager?.setVirtualBeaconCallback(virtualBeaconCallback)
             indoorLocationManager?.start(indoorLocationCallback)
         }

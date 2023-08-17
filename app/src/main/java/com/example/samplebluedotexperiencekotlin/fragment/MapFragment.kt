@@ -3,8 +3,10 @@ package com.example.samplebluedotexperiencekotlin.fragment
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Application
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -13,15 +15,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import butterknife.BindView
 import butterknife.ButterKnife
 import butterknife.Unbinder
-import com.example.samplebluedotexperiencekotlin.R
+import com.example.samplebluedotexperiencekotlin.databinding.MapFragmentBinding
 import com.example.samplebluedotexperiencekotlin.initializer.MistSdkManager
 import com.mist.android.ErrorType
 import com.mist.android.IndoorLocationCallback
@@ -33,9 +31,9 @@ import com.squareup.picasso.Picasso
 
 
 class MapFragment : Fragment(),IndoorLocationCallback{
-   /* companion object{
-        const val floorplanb= R.id.floorplanbluedot
-    }*/
+
+    private var _binding : MapFragmentBinding?=null
+    private val binding get() = _binding!!
 
     private lateinit var mistSdkManager : MistSdkManager
 
@@ -65,21 +63,21 @@ class MapFragment : Fragment(),IndoorLocationCallback{
 
     private var floorImageTopmargin : Float = 0.0F
 
-    private lateinit var unbinder: Unbinder
+    //private lateinit var unbinder: Unbinder
 
     lateinit var currentmap : MistMap
 
     //@BindView(R.id.floorplanbluedot)
-    var floorplanBluedotView : FrameLayout = floorplanbluedot
+    //var floorplanBluedotView : FrameLayout = binding.floorplanbluedot
 
     //@BindView(R.id.progress_bar)
-    var progressBar: ProgressBar = progress_bar
+    //var progressBar: ProgressBar = binding.pro
 
     //@BindView(R.id.floorplan_image)
-    var floorPlanImage: ImageView = floorplan_image
+    //var floorPlanImage: ImageView = bindin
 
     //@BindView(R.id.txt_error)
-    var txtError : TextView = txt_error
+    //var txtError : TextView = txt_error
 
     fun newInstance(sdkToken: String): MapFragment {
         val bundle = Bundle()
@@ -100,10 +98,11 @@ class MapFragment : Fragment(),IndoorLocationCallback{
      */
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view:View=inflater.inflate(R.layout.map_fragment,container,false)
-        unbinder = ButterKnife.bind(this,view)
-        progressBar.visibility=View.VISIBLE
-        return view
+        //val view:View=inflater.inflate(R.layout.map_fragment,container,false)
+        _binding = MapFragmentBinding.inflate(inflater,container,false)
+        //unbinder = ButterKnife.bind(this,view)
+        binding.progressBar.visibility=View.VISIBLE
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -125,7 +124,8 @@ class MapFragment : Fragment(),IndoorLocationCallback{
 
     override fun onDestroyView() {
         super.onDestroyView()
-        unbinder.unbind()
+        //unbinder.unbind()
+        _binding = null
         mistSdkManager.destroyMistSdk()
     }
 
@@ -141,7 +141,7 @@ class MapFragment : Fragment(),IndoorLocationCallback{
             builder.setMessage("Please grant bluetooth/location access so this app can detect beacons in the background")
             builder.setPositiveButton(android.R.string.ok, null)
             builder.setOnDismissListener {
-                requestPermissions(permissionRequired.toArray() as Array<out String>, PERMISSION_REQUEST_BLUETOOTH_LOCATION)
+                //requestPermissions(permissionRequired.toArray() as Array<out String>, PERMISSION_REQUEST_BLUETOOTH_LOCATION)
             }
             builder.show()
         }
@@ -174,6 +174,11 @@ class MapFragment : Fragment(),IndoorLocationCallback{
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && activity != null && requireActivity().checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             return
         }
+        val bluetoothAdapter : BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        if(!(bluetoothAdapter!=null && bluetoothAdapter.isEnabled() && bluetoothAdapter.state== BluetoothAdapter.STATE_ON)){
+            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH)
+        }
     }
 
     private fun startSDK(orgSecret: String) {
@@ -197,7 +202,7 @@ class MapFragment : Fragment(),IndoorLocationCallback{
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && activity != null && requireActivity().checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             permissionRequired.add(android.Manifest.permission.BLUETOOTH_CONNECT)
         }
-        if(permissionRequired.size>0){
+        if(permissionRequired.size > 0){
             showLocationBluetoothPermissionDialog(permissionRequired)
         }
         else{
@@ -232,7 +237,7 @@ class MapFragment : Fragment(),IndoorLocationCallback{
         floorPlanImageUrl = map!!.url
         Log.d(TAG,"SampleBlueDot "+ floorPlanImageUrl)
         // Set the current map
-        if(activity!=null && (floorPlanImage.drawable==null || this.currentmap == null || !this.currentmap.id.equals(map.id))){
+        if(activity!=null && (binding.floorplanImage.drawable==null || this.currentmap == null || !this.currentmap.id.equals(map.id))){
             this.currentmap = map
             requireActivity().runOnUiThread {
                 renderImage(floorPlanImageUrl)
@@ -241,11 +246,11 @@ class MapFragment : Fragment(),IndoorLocationCallback{
     }
     override fun onError(errorType: ErrorType?, errorMessage: String?) {
         Log.d(TAG,"SampleBlueDot onError called" + errorMessage + "errorType " + errorType)
-        floorplanBluedotView.visibility = View.GONE
-        floorPlanImage.visibility = View.GONE
-        progressBar.visibility = View.GONE
-        txtError.visibility = View.VISIBLE
-        txtError.text = errorMessage
+        binding.floorplanbluedot.visibility = View.GONE
+        binding.floorplanImage.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
+        binding.txtError.visibility = View.VISIBLE
+        binding.txtError.text = errorMessage
 
     }
 
@@ -266,13 +271,13 @@ class MapFragment : Fragment(),IndoorLocationCallback{
     private fun renderImage(floorPlanImageUrl: String?) {
         Log.d(TAG,"In Piccaso")
         addedMap = false
-        floorPlanImage.visibility=View.VISIBLE
-        Picasso.with(activity).load(floorPlanImageUrl).networkPolicy(NetworkPolicy.OFFLINE).into(floorPlanImage, object : Callback {
+        binding.floorplanImage.visibility=View.VISIBLE
+        Picasso.with(activity).load(floorPlanImageUrl).networkPolicy(NetworkPolicy.OFFLINE).into(binding.floorplanImage, object : Callback {
                 override fun onSuccess() {
                     Log.d(TAG, "Image loaded successfully from the cached")
                     addedMap = true
-                    floorplanBluedotView.visibility = View.VISIBLE
-                    progressBar.visibility = View.GONE
+                    binding.floorplanbluedot.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
                     if (!scaleFactorCalled) {
                         setupScaleFactorForFloorplan()
                     }
@@ -280,10 +285,10 @@ class MapFragment : Fragment(),IndoorLocationCallback{
 
                 override fun onError() {
                     Picasso.with(activity).load(floorPlanImageUrl)
-                        .into(floorPlanImage, object : Callback {
+                        .into(binding.floorplanImage, object : Callback {
                             override fun onSuccess() {
-                                floorplanBluedotView.visibility = View.VISIBLE
-                                progressBar.visibility = View.GONE
+                                binding.floorplanbluedot.visibility = View.VISIBLE
+                                binding.progressBar.visibility = View.GONE
                                 addedMap = true
                                 if (!scaleFactorCalled) {
                                     setupScaleFactorForFloorplan()
@@ -292,7 +297,7 @@ class MapFragment : Fragment(),IndoorLocationCallback{
                             }
 
                             override fun onError() {
-                                progressBar.visibility = View.GONE
+                                binding.progressBar.visibility = View.GONE
                                 Log.d(TAG, "Could not download the image from the server")
                             }
                         })
@@ -302,37 +307,37 @@ class MapFragment : Fragment(),IndoorLocationCallback{
     }
 
     private fun renderBlueDot(point : MistPoint?) {
-        floorPlanImage.visibility = View.VISIBLE
+        binding.floorplanImage.visibility = View.VISIBLE
         if(activity!=null){
             requireActivity().runOnUiThread {
-                if (floorPlanImage != null && floorPlanImage.drawable != null && point != null && addedMap) {
+                if (binding.floorplanImage != null && binding.floorplanImage.drawable != null && point != null && addedMap) {
                     // When rendering bluedot hiding old error text
-                    txtError.visibility = View.GONE
+                    binding.txtError.visibility = View.GONE
                     val xPos: Float = convertCloudPointToFloorplanXScale(point.getX())
                     val yPos: Float = convertCloudPointToFloorplanYScale(point.getY())
                     // If scaleX and scaleY are not defined, check again
                     if (!scaleFactorCalled && (scaleXFactor == 0.0 || scaleYFactor == 0.0)) {
                         setupScaleFactorForFloorplan()
                     }
-                    val leftMargin: Float = floorImageLeftmargin + (xPos - floorplanBluedotView.width) / 2
-                    val topMargin: Float = floorImageTopmargin + (yPos - floorplanBluedotView.height) / 2
-                    floorplanBluedotView.x = leftMargin
-                    floorplanBluedotView.y = topMargin
+                    val leftMargin: Float = floorImageLeftmargin + (xPos - binding.floorplanbluedot.width) / 2
+                    val topMargin: Float = floorImageTopmargin + (yPos - binding.floorplanbluedot.height) / 2
+                    binding.floorplanbluedot.x = leftMargin
+                    binding.floorplanbluedot.y = topMargin
                 }
             }
         }
     }
 
     private fun setupScaleFactorForFloorplan(){
-        if(floorPlanImage!=null){
-            val vto:ViewTreeObserver = floorPlanImage.viewTreeObserver
+        if(binding.floorplanImage!=null){
+            val vto:ViewTreeObserver = binding.floorplanImage.viewTreeObserver
             vto.addOnGlobalLayoutListener {
-                if (floorPlanImage != null) {
-                    floorImageLeftmargin= floorPlanImage.left.toFloat()
-                    floorImageTopmargin = floorPlanImage.top.toFloat()
-                    if (floorPlanImage.drawable != null) {
-                        scaleXFactor = floorPlanImage.width / floorPlanImage.drawable.intrinsicWidth.toDouble()
-                        scaleYFactor = floorPlanImage.height / floorPlanImage.drawable.intrinsicHeight.toDouble()
+                if (binding.floorplanImage!= null) {
+                    floorImageLeftmargin= binding.floorplanImage.left.toFloat()
+                    floorImageTopmargin = binding.floorplanImage.top.toFloat()
+                    if (binding.floorplanImage.drawable != null) {
+                        scaleXFactor = binding.floorplanImage.width / binding.floorplanImage.drawable.intrinsicWidth.toDouble()
+                        scaleYFactor = binding.floorplanImage.height / binding.floorplanImage.drawable.intrinsicHeight.toDouble()
                         scaleFactorCalled = true
                     }
                 }
