@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import butterknife.BindView
 import butterknife.ButterKnife
@@ -134,7 +135,7 @@ class MapFragment : Fragment(),IndoorLocationCallback{
         mistSdkManager.stopMistSdk()
     }
 
-    private fun showLocationBluetoothPermissionDialog(permissionRequired: ArrayList<String>) {
+    private fun showLocationBluetoothPermissionDialog(permissionRequired: MutableList<String>) {
         if(activity!=null){
             val builder = AlertDialog.Builder(activity)
             builder.setTitle("This app needs bluetooth and location permission")
@@ -142,6 +143,11 @@ class MapFragment : Fragment(),IndoorLocationCallback{
             builder.setPositiveButton(android.R.string.ok, null)
             builder.setOnDismissListener {
                 //requestPermissions(permissionRequired.toArray() as Array<out String>, PERMISSION_REQUEST_BLUETOOTH_LOCATION)
+                val permissionToRequest =permissionRequired.filter {
+                    ContextCompat.checkSelfPermission(requireActivity(),it)!=PackageManager.PERMISSION_GRANTED }.toTypedArray()
+                if(permissionToRequest.isNotEmpty()){
+                    requestPermissions(arrayOf(android.Manifest.permission.BLUETOOTH_CONNECT, android.Manifest.permission.BLUETOOTH_SCAN, android.Manifest.permission.ACCESS_FINE_LOCATION),PERMISSION_REQUEST_BLUETOOTH_LOCATION)
+                }
             }
             builder.show()
         }
@@ -190,7 +196,7 @@ class MapFragment : Fragment(),IndoorLocationCallback{
     }
 
     private fun checkPermissionAndStartSDK() {
-        val permissionRequired = ArrayList<String>()
+        val permissionRequired : MutableList<String> = ArrayList()
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M && activity!=null && requireActivity().checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
             permissionRequired.add(android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
